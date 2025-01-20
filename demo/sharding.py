@@ -18,8 +18,7 @@ dsn = "postgresql://{}:{}@{}:{}/{}".format(*[settings.DATABASES["default"].get(k
 
 
 def get_create_sql_for_model(model):
-    # 生成的表名无论如何都有app_label前缀，也不理会Meta里指定，
-    # operation.database_forwards生成fake model，这一步重新生成了db_table；与真是运行migrate不同点在ProjectState
+    # 生成的表名有app_label前缀
     model_state = ModelState.from_model(model)
 
     # Create a fake migration with the CreateModel operation
@@ -102,11 +101,11 @@ class ShardingMixin:
     @classmethod
     def _create_model_with_table(cls, table_name, model_name):
         model = cls._create_model(table_name, model_name)
-        # 兼容协程试图
+        # 兼容协程视图
         with concurrent.futures.ThreadPoolExecutor() as executor:
             task = executor.submit(get_create_sql_for_model, model)
         concurrent.futures.wait([task])
-        # 生成的sql表明带app_label前缀
+        # 生成的sql表名带app_label前缀
         sql = task.result()
         with psycopg.connect(dsn) as conn:
             try:

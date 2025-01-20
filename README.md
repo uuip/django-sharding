@@ -44,4 +44,4 @@ class Some(View):
 ```
 
 4. 关于migrations  
-分表的模型会在migrations生成，但已设置`managed=False`，故不会在migrate时创建-- 在步骤3 create=True 时创建。
+分表的模型会在migrations中生成，但已设置`managed=False`，故不会在migrate时创建表 -- 在步骤3 create=True 时创建。
